@@ -12,7 +12,7 @@ using System.Diagnostics;
 public static class AppLogger
 {
     private static readonly string LogPath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+        AppContext.BaseDirectory,
         "rawtorrent_errors.log");
 
     private static readonly bool _enabled = ReadEnabledFromSettings();

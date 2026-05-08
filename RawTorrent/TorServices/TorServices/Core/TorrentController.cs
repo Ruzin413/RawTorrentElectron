@@ -31,7 +31,7 @@ public class TorrentController
     public bool SequentialMode { get; set; } = false;
 
     private readonly SemaphoreSlim _downloadSemaphore = new(1, 1);
-    private const int MaxActiveSessions = 100;
+    private const int MaxActiveSessions = 200;
     public byte[]? InfoHash { get; private set; }
     public string Id { get; private set; } = Guid.NewGuid().ToString("N");
     public void SetId(string id) => Id = id;

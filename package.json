@@ -9,19 +9,29 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
-    "publish:backend": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
-    "build": "npm run publish:backend && electron-builder"
+    "publish:backend:win": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
+    "publish:backend:linux": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
+    "build:win": "npm run publish:backend:win && electron-builder --win",
+    "build:linux": "npm run publish:backend:linux && electron-builder --linux"
   },
   "build": {
     "appId": "com.rawtorrent.app",
     "productName": "RawTorrent",
-    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "artifactName": "${productName}-${os}-${version}.${ext}",
     "directories": {
       "output": "dist-installer"
     },
     "win": {
       "target": "nsis",
       "icon": "build/installer/icon.png"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/installer/icon.png",
+      "category": "Network"
     },
     "nsis": {
       "oneClick": false,

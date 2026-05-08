@@ -124,7 +124,7 @@ public class PeerSession : IDisposable
         {
             token.ThrowIfCancellationRequested();
 
-            while (blocks.Count < 30 && requested < length)
+            while (blocks.Count < 60 && requested < length)
             {
                 int bLen = Math.Min(BlockSize, length - requested);
                 blocks.Add(RequestBlockAsync(index, requested, bLen, token));

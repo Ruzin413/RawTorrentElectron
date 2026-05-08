@@ -33,19 +33,36 @@ function startBackend() {
   let args = ['run', '--project', 'RawTorrent/TorServices/TorServices/TorServices.csproj'];
 
   if (!isDev) {
-    command = path.join(process.resourcesPath, 'backend', 'TorServices.exe');
+    const executableName = process.platform === 'win32' ? 'TorServices.exe' : 'TorServices';
+    command = path.join(process.resourcesPath, 'backend', executableName);
     args = [];
   }
 
-  console.log(`Starting backend: ${command} ${args.join(' ')}`);
+  const backendDir = isDev ? __dirname : path.join(process.resourcesPath, 'backend');
+
+  const fs = require('fs');
+  if (!isDev && !fs.existsSync(command)) {
+    console.error(`Backend executable not found at: ${command}`);
+    dialog.showErrorBox('Backend Error', `The backend executable was not found at:\n${command}`);
+    return;
+  }
+
+  console.log(`Starting backend from ${backendDir}: ${command} ${args.join(' ')}`);
 
   backendProcess = spawn(command, args, {
-    cwd: __dirname,
-    stdio: 'inherit'
+    cwd: backendDir,
+    stdio: 'ignore',
+    env: { ...process.env, ASPNETCORE_URLS: 'http://localhost:5000' },
+    windowsHide: true
   });
 
   backendProcess.on('error', (err) => {
     console.error('Failed to start backend:', err);
+    dialog.showErrorBox('Backend Failed', `Failed to start backend process:\n${err.message}`);
+  });
+
+  backendProcess.on('close', (code) => {
+    console.log(`Backend process exited with code ${code}`);
   });
 }
 
@@ -80,6 +97,13 @@ app.on('window-all-closed', function () {
 
 app.on('will-quit', () => {
   if (backendProcess) {
-    backendProcess.kill();
+    if (process.platform === 'win32') {
+      const { exec } = require('child_process');
+      // On Windows, we need to kill the process tree to ensure the backend stops
+      exec(`taskkill /pid ${backendProcess.pid} /f /t`);
+    } else {
+      // On Linux/Mac, SIGTERM usually suffices, or we can use process.kill
+      backendProcess.kill('SIGTERM');
+    }
   }
 });
