@@ -1,0 +1,88 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|c:\\users\\dell\\desktop\\rawtorrent\\torservices\\torservices\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|solutionrelative:torservices\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|c:\\users\\dell\\desktop\\rawtorrent\\torservices\\torservices\\parser\\torrentfilereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|solutionrelative:torservices\\parser\\torrentfilereader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|c:\\users\\dell\\desktop\\rawtorrent\\torservices\\torservices\\cli\\commandparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|solutionrelative:torservices\\cli\\commandparser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|c:\\users\\dell\\desktop\\rawtorrent\\torservices\\torservices\\core\\torrentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B8E4C09-69AC-4E31-85A4-E3BF3F715C03}|TorServices\\TorServices.csproj|solutionrelative:torservices\\core\\torrentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TorrentFileReader.cs",
+              "DocumentMoniker": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\Parser\\TorrentFileReader.cs",
+              "RelativeDocumentMoniker": "TorServices\\Parser\\TorrentFileReader.cs",
+              "ToolTip": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\Parser\\TorrentFileReader.cs",
+              "RelativeToolTip": "TorServices\\Parser\\TorrentFileReader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-13T08:12:48.227Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "TorrentController.cs",
+              "DocumentMoniker": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\Core\\TorrentController.cs",
+              "RelativeDocumentMoniker": "TorServices\\Core\\TorrentController.cs",
+              "ToolTip": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\Core\\TorrentController.cs",
+              "RelativeToolTip": "TorServices\\Core\\TorrentController.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAQwAEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-13T08:12:36.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CommandParser.cs",
+              "DocumentMoniker": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\CLI\\CommandParser.cs",
+              "RelativeDocumentMoniker": "TorServices\\CLI\\CommandParser.cs",
+              "ToolTip": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\CLI\\CommandParser.cs",
+              "RelativeToolTip": "TorServices\\CLI\\CommandParser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-13T08:12:24.954Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\Program.cs",
+              "RelativeDocumentMoniker": "TorServices\\Program.cs",
+              "ToolTip": "C:\\Users\\Dell\\Desktop\\RawTorrent\\TorServices\\TorServices\\Program.cs",
+              "RelativeToolTip": "TorServices\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-13T08:09:17.869Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

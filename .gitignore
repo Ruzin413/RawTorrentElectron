@@ -40,6 +40,5 @@ downloads/
 Thumbs.db
 desktop.ini
 *.vsidx
-*.json
 *.v2
 *.ps1
