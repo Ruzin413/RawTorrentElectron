@@ -1,0 +1,30 @@
+# Node / Electron
+node_modules/
+dist/
+dist-installer/
+dist-backend/
+*.log
+
+# .NET / C#
+bin/
+obj/
+[Oo]bj/
+[Bb]in/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Backend specific build artifacts
+RawTorrent/TorServices/TorServices/bin/
+RawTorrent/TorServices/TorServices/obj/
+
+# Local configuration / Data
+appsettings.Development.json
+*.db
+*.csv
+metadata/
+downloads/
+
+# OS files
+.DS_Store
+Thumbs.db

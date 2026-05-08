@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RawTorrent Engine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">RawTorrent</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-group">
+                    <span class="nav-group-title">Torrents</span>
+                    <button class="nav-item active" data-tab="all">
+                        <span class="icon">📁</span> All
+                    </button>
+                    <button class="nav-item" data-tab="downloading">
+                        <span class="icon">⬇️</span> Downloading
+                    </button>
+                    <button class="nav-item" data-tab="completed">
+                        <span class="icon">✅</span> Completed
+                    </button>
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span class="status-text">Engine: Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <!-- Toolbar -->
+            <header class="toolbar">
+                <div class="toolbar-group">
+                    <button id="add-torrent-btn" class="tool-btn" title="Add Torrent File">
+                        <span class="tool-icon">➕</span> Add Torrent
+                    </button>
+                    <button id="add-magnet-btn" class="tool-btn" title="Add Torrent from URL">
+                        <span class="tool-icon">🔗</span> Add Magnet
+                    </button>
+                </div>
+                <div class="toolbar-spacer"></div>
+                <div class="search-box">
+                    <input type="text" placeholder="Search torrents…">
+                </div>
+            </header>
+
+            <!-- Context Menu -->
+            <div id="context-menu" class="context-menu">
+                <button class="ctx-item" data-action="resume"><span class="ctx-icon">▶️</span> Resume</button>
+                <button class="ctx-item" data-action="stop"><span class="ctx-icon">⏹️</span> Stop</button>
+                <div class="ctx-divider"></div>
+                <button class="ctx-item" data-action="open-folder"><span class="ctx-icon">📂</span> Open Folder</button>
+                <div class="ctx-divider"></div>
+                <button class="ctx-item" data-action="remove"><span class="ctx-icon">🗑️</span> Remove</button>
+                <button class="ctx-item ctx-danger" data-action="remove-data"><span class="ctx-icon">💀</span> Remove
+                    with Data</button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="torrent-table">
+                    <thead>
+                        <tr>
+                            <th class="col-name">Name</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-size">Size</th>
+                            <th class="col-progress">Done</th>
+                            <th class="col-peers">Peers</th>
+                        </tr>
+                    </thead>
+                    <tbody id="torrent-list"></tbody>
+                </table>
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <p>No torrents to display.</p>
+                </div>
+            </div>
+
+            <!-- Details Pane -->
+            <div class="details-pane">
+                <div class="details-tabs">
+                    <button class="details-tab active">General</button>
+                </div>
+                <div class="details-content" id="details-content">
+                    <div class="info-grid">
+                        <div class="info-item"><span class="label">Time Elapsed:</span> <span class="val">--</span>
+                        </div>
+                        <div class="info-item"><span class="label">Remaining:</span> <span class="val">--</span></div>
+                        <div class="info-item"><span class="label">Downloaded:</span> <span class="val">--</span></div>
+                        <div class="info-item"><span class="label">Uploaded:</span> <span class="val">--</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Magnet Modal -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="magnet-modal" class="modal">
+        <div class="modal-header">
+            <h3>Add Torrent from URL</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="magnet-uri">Magnet Link or InfoHash</label>
+                <input type="text" id="magnet-uri" placeholder="magnet:?xt=urn:btih:…">
+            </div>
+            <div class="form-group">
+                <label for="output-dir">Download Location</label>
+                <div class="input-group">
+                    <input type="text" id="output-dir" placeholder="C:\Downloads">
+                    <button id="browse-dir-btn" class="btn btn-secondary">Browse…</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary close-modal">Cancel</button>
+            <button id="submit-magnet" class="btn btn-primary">Add Torrent</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+{
+  "name": "rawtorrent-electron",
+  "version": "1.0.0",
+  "description": "Cross-platform Torrent Client with .NET Backend",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "publish:backend": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
+    "build": "npm run publish:backend && electron-builder"
+  },
+  "build": {
+    "appId": "com.rawtorrent.app",
+    "productName": "RawTorrent",
+    "directories": {
+      "output": "dist-installer"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "RawTorrent/TorServices/TorServices/Resources/icon.jpg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "installerIcon": "RawTorrent/TorServices/TorServices/Resources/icon.jpg",
+      "uninstallerIcon": "RawTorrent/TorServices/TorServices/Resources/icon.jpg"
+    },
+    "extraResources": [
+      {
+        "from": "dist-backend",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  },
+  "dependencies": {
+    "electron": "^31.0.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.13.3"
+  }
+}
