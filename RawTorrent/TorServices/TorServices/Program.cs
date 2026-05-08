@@ -125,7 +125,7 @@ class Program
 
             int port = 5000;
             bool started = false;
-            while (!started && port < 5100)
+            while (!started && port < 5900)
             {
                 try
                 {
@@ -221,4 +221,4 @@ class Program
         Console.WriteLine("  -o, --output <dir>    Specify output directory");
         Console.WriteLine("  -v, --verbose         Enable verbose logging");
     }
-}
+}

@@ -15,19 +15,22 @@
   "build": {
     "appId": "com.rawtorrent.app",
     "productName": "RawTorrent",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
     "directories": {
       "output": "dist-installer"
     },
     "win": {
       "target": "nsis",
-      "icon": "RawTorrent/TorServices/TorServices/Resources/app_icon.ico"
+      "icon": "build/installer/icon.png"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "installerIcon": "RawTorrent/TorServices/TorServices/Resources/app_icon.ico",
-      "uninstallerIcon": "RawTorrent/TorServices/TorServices/Resources/app_icon.ico"
+      "license": "LICENSE",
+      "allowElevation": true,
+      "runAfterFinish": true,
+      "shortcutName": "RawTorrent"
     },
     "extraResources": [
       {

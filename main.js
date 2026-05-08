@@ -10,7 +10,7 @@ function createWindow() {
     width: 1000,
     height: 700,
     title: "RawTorrent Engine",
-    icon: path.join(__dirname, 'RawTorrent/TorServices/TorServices/Resources/icon.jpg'),
+    icon: path.join(__dirname, 'build/installer/icon.png'),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
