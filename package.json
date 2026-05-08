@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Cross-platform Torrent Client with .NET Backend",
   "main": "main.js",
+  "author": {
+    "name": "Rujin Manandhar"
+  },
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
@@ -17,14 +20,14 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "RawTorrent/TorServices/TorServices/Resources/icon.jpg"
+      "icon": "RawTorrent/TorServices/TorServices/Resources/app_icon.ico"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "installerIcon": "RawTorrent/TorServices/TorServices/Resources/icon.jpg",
-      "uninstallerIcon": "RawTorrent/TorServices/TorServices/Resources/icon.jpg"
+      "installerIcon": "RawTorrent/TorServices/TorServices/Resources/app_icon.ico",
+      "uninstallerIcon": "RawTorrent/TorServices/TorServices/Resources/app_icon.ico"
     },
     "extraResources": [
       {
@@ -36,10 +39,9 @@
       }
     ]
   },
-  "dependencies": {
-    "electron": "^31.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "electron": "^31.0.0",
     "electron-builder": "^24.13.3"
   }
 }

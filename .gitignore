@@ -39,6 +39,3 @@ downloads/
 .DS_Store
 Thumbs.db
 desktop.ini
-*.vsidx
-*.v2
-*.ps1

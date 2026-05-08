@@ -346,10 +346,12 @@ function updateProgressCell(cell, value, text, speedStr, isPulsing) {
             <div class="progress-cell">
                 <div class="progress-mini">
                     <div class="progress-fill" style="width: 0%"></div>
-                </div>
                 <div class="progress-meta">
                     <span class="progress-text"></span>
                     <span class="speed-text"></span>
+                </div>
+                <div class="progress-mini">
+                    <div class="progress-fill" style="width: 0%"></div>
                 </div>
             </div>`;
         container = cell.querySelector('.progress-cell');
