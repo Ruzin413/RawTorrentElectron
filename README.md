@@ -2,8 +2,6 @@
 
 **RawTorrent** is a premium, high-performance desktop torrent client. It combines a lightning-fast **C# .NET Engine** with a modern, sleek **Electron** frontend to deliver a truly state-of-the-art downloading experience.
 
-![RawTorrent Icon](RawTorrent/TorServices/TorServices/Resources/icon.jpg)
-
 ## ✨ Key Features
 
 - **Premium UI**: A stunning, modern interface built with Syne & DM Sans typography, featuring subtle micro-animations and a sleek light-mode design.
