@@ -3,7 +3,11 @@ node_modules/
 dist/
 dist-installer/
 dist-backend/
+out/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # .NET / C#
 bin/
@@ -13,10 +17,14 @@ obj/
 *.user
 *.userosscache
 *.sln.docstates
+*.suo
+*.bin
 
-# Backend specific build artifacts
-RawTorrent/TorServices/TorServices/bin/
-RawTorrent/TorServices/TorServices/obj/
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Local configuration / Data
 appsettings.Development.json
@@ -24,7 +32,14 @@ appsettings.Development.json
 *.csv
 metadata/
 downloads/
+!RawTorrent/TorServices/TorServices/Resources/*.jpg
+!RawTorrent/TorServices/TorServices/Resources/*.ico
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+*.vsidx
+*.json
+*.v2
+*.ps1
