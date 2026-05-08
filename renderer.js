@@ -308,9 +308,8 @@ function renderTorrents() {
         if (cells[0].innerHTML !== nameHtml) cells[0].innerHTML = nameHtml;
 
         // Cell 1: Status
-        const statusHtml = displayStatus;
-        cells[1].className = `status-text ${statusClass}`;
-        if (cells[1].textContent !== statusHtml) cells[1].textContent = statusHtml;
+        const statusHtml = `<span class="status-text ${statusClass}">${displayStatus}</span>`;
+        if (cells[1].innerHTML !== statusHtml) cells[1].innerHTML = statusHtml;
 
         // Cell 2: Size
         const sizeText = formatBytes(t.totalSize);
@@ -346,12 +345,10 @@ function updateProgressCell(cell, value, text, speedStr, isPulsing) {
             <div class="progress-cell">
                 <div class="progress-mini">
                     <div class="progress-fill" style="width: 0%"></div>
+                </div>
                 <div class="progress-meta">
                     <span class="progress-text"></span>
                     <span class="speed-text"></span>
-                </div>
-                <div class="progress-mini">
-                    <div class="progress-fill" style="width: 0%"></div>
                 </div>
             </div>`;
         container = cell.querySelector('.progress-cell');
