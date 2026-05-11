@@ -11,9 +11,7 @@ using TorServices.Core;
 using TorServices.Network;
 using TorServices.Parser;
 using TorServices.DHT;
-
 namespace TorServices.Core;
-
 public class TorrentController
 {
     private readonly TrackerClient _tracker = new();
@@ -25,11 +23,9 @@ public class TorrentController
     private readonly List<Task> _backgroundTasks = new();
     private PieceManager? _pieceManager;
     private CancellationTokenSource? _cts;
-    private readonly ConcurrentDictionary<string, int> _peerStrikes = new();
     private readonly ConcurrentDictionary<string, long> _downloadedFromPeer = new();
     private readonly ConcurrentDictionary<string, long> _uploadedToPeer = new();
     public bool SequentialMode { get; set; } = false;
-
     private readonly SemaphoreSlim _downloadSemaphore = new(1, 1);
     private const int MaxActiveSessions = 200;
     public byte[]? InfoHash { get; private set; }
@@ -38,12 +34,9 @@ public class TorrentController
     public string Name { get; set; } = "Initializing...";
     public string Status { get; set; } = "Queued";
     public int TotalPieces { get; set; }
-
     private int _lastCompletedPieces;
     public int CompletedPieces => _pieceManager?.CompletedCount ?? _lastCompletedPieces;
-
     public int ActivePeersCount => _activeSessions.Count;
-    
     private byte[]? _initialBitfield;
     public byte[]? InitialBitfield 
     { 
@@ -54,15 +47,12 @@ public class TorrentController
             if (value != null) _lastCompletedPieces = CountSetBits(value);
         } 
     }
-
     public long TotalSize { get; set; }
     public string? TorrentPath { get; set; }
     public string? MagnetUri { get; set; }
     public string? OutputDir { get; set; }
     public string? ClientId { get; set; }
     public string? MetadataCacheDir { get; set; }
-
-
     public async Task Stop()
     {
         _cts?.Cancel();
@@ -159,7 +149,6 @@ public class TorrentController
                 } catch { }
             }).FireAndForget("Tracker Discovery");
         }
-
         DateTime start = DateTime.Now;
         while (_peerDiscoveryQueue.IsEmpty && (DateTime.Now - start).TotalSeconds < 30) await Task.Delay(500);
 
@@ -358,8 +347,7 @@ public class TorrentController
                                                     _downloadedFromPeer.AddOrUpdate(session.Address, data.Length, (k, v) => v + data.Length);
                                                 } else {
                                                     _pieceManager.ReleasePiece(pieceIndex);
-                                                    int strikes = _peerStrikes.AddOrUpdate(session.Address, 1, (k, v) => v + 1);
-                                                    if (strikes >= 3) session.Dispose();
+                                                    session.Dispose();
                                                 }
                                             } catch {
                                                 _pieceManager.ReleasePiece(pieceIndex);
@@ -372,6 +360,9 @@ public class TorrentController
                                 }
                             }
                         } catch { }
+                        finally {
+                            _triedPeers.TryRemove(peerAddr, out _);
+                        }
                     }
                     else
                     {

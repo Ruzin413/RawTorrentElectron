@@ -21,6 +21,14 @@
     "directories": {
       "output": "dist-installer"
     },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "style.css",
+      "package.json",
+      "build/**/*"
+    ],
     "win": {
       "target": "nsis",
       "icon": "build/installer/icon.png"
