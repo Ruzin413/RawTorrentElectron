@@ -616,6 +616,21 @@ function formatDuration(seconds) {
     return `${s}s`;
 }
 
+// ─── Incoming Magnet Links from OS ───
+ipcRenderer.on('magnet-uri', (event, data) => {
+  const uri = typeof data === 'string' ? data : data.uri;
+  const defaultDir = data.defaultDir || '';
+  if (uri) {
+    magnetUriInput.value = uri;
+    outputDirInput.value = defaultDir;
+    magnetModal.classList.add('visible');
+    modalOverlay.classList.add('visible');
+    magnetUriInput.focus();
+
+    showToast('Magnet link received — choose folder and click Add', 'info');
+  }
+});
+
 // ─── Startup ───
 updateConnectionStatus(false);
 refreshTorrents();

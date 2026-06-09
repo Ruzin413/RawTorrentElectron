@@ -9,6 +9,8 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
+    "register:protocol": "powershell -ExecutionPolicy Bypass -File scripts/register-protocol.ps1",
+    "unregister:protocol": "powershell -ExecutionPolicy Bypass -File scripts/register-protocol.ps1 -Unregister",
     "publish:backend:win": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
     "publish:backend:linux": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
     "build:win": "npm run publish:backend:win && electron-builder --win",
@@ -41,6 +43,14 @@
       "icon": "build/installer/icon.png",
       "category": "Network"
     },
+    "protocols": [
+      {
+        "name": "Magnet Link",
+        "schemes": [
+          "magnet"
+        ]
+      }
+    ],
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
@@ -48,7 +58,8 @@
       "license": "LICENSE",
       "allowElevation": true,
       "runAfterFinish": true,
-      "shortcutName": "RawTorrent"
+      "shortcutName": "RawTorrent",
+      "perMachine": true
     },
     "extraResources": [
       {
@@ -60,7 +71,6 @@
       }
     ]
   },
-  "dependencies": {},
   "devDependencies": {
     "electron": "^31.0.0",
     "electron-builder": "^24.13.3"

@@ -5,6 +5,22 @@ const { spawn } = require('child_process');
 let mainWindow;
 let backendProcess;
 
+// Single instance lock to handle magnet protocol links on Windows/Linux
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (event, commandLine) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+      const magnet = commandLine.find(arg => arg.startsWith('magnet:'));
+      if (magnet) sendMagnetUri(magnet);
+    }
+  });
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
@@ -66,9 +82,29 @@ function startBackend() {
   });
 }
 
+function sendMagnetUri(uri) {
+  if (mainWindow) {
+    mainWindow.webContents.send('magnet-uri', { uri, defaultDir: app.getPath('downloads') });
+  }
+}
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  if (url.startsWith('magnet:')) sendMagnetUri(url);
+});
+
 app.whenReady().then(() => {
+  app.setName('RawTorrent');
+  if (app.isPackaged) app.setAsDefaultProtocolClient('magnet');
   startBackend();
   createWindow();
+
+  const magnetUri = process.argv.find(arg => arg.startsWith('magnet:'));
+  if (magnetUri) {
+    mainWindow.webContents.once('did-finish-load', () => {
+      sendMagnetUri(magnetUri);
+    });
+  }
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
