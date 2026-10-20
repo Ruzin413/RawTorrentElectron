@@ -102,6 +102,7 @@ public class TorrentController
 
     public async Task StartDownload(string torrentPath, string? outputDir = null)
     {
+        outputDir = AppPaths.ResolveOutputDir(outputDir);
         this.TorrentPath = torrentPath;
         this.OutputDir = outputDir;
         Console.WriteLine($"[+] Starting torrent download from file: {torrentPath}");
@@ -128,6 +129,7 @@ public class TorrentController
 
     public async Task StartMagnetDownload(string magnetUri, string? outputDir = null)
     {
+        outputDir = AppPaths.ResolveOutputDir(outputDir);
         this.MagnetUri = magnetUri;
         this.OutputDir = outputDir;
         var magnet = MagnetParser.Parse(magnetUri);
@@ -238,8 +240,8 @@ public class TorrentController
             Name = metadata.Name;
             string finalName = Name;
             int counter = 1;
-            while (Directory.Exists(Path.Combine(outputDir!, finalName)) || 
-                   File.Exists(Path.Combine(outputDir!, finalName)))
+            while (Directory.Exists(Path.Combine(outputDir!, TorrentMetadata.CleanupPath(finalName))) || 
+                   File.Exists(Path.Combine(outputDir!, TorrentMetadata.CleanupPath(finalName))))
             {
                 finalName = $"{Name} ({counter++})";
             }

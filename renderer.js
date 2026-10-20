@@ -1,5 +1,21 @@
 const { ipcRenderer } = require('electron');
-const API_BASE = 'http://localhost:5000/api/torrents';
+const launchParams = new URLSearchParams(window.location.search);
+const API_BASE = launchParams.get('port')
+    ? `http://127.0.0.1:${launchParams.get('port')}/api/torrents`
+    : 'http://localhost:5000/api/torrents';
+const DEFAULT_DOWNLOAD_DIR = launchParams.get('downloadsDir') || '';
+document.body.classList.add(`platform-${process.platform}`);
+
+// Torrent names/paths come from the network, so they are escaped before reaching innerHTML
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+}
+
+function svgIcon(name, className = '') {
+    return `<svg class="ico ${className}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+}
 
 // DOM Elements
 const torrentList = document.getElementById('torrent-list');
@@ -42,7 +58,7 @@ navItems.forEach(item => {
         navItems.forEach(ni => ni.classList.remove('active'));
         item.classList.add('active');
         currentTab = item.dataset.tab;
-        pageTitle.textContent = item.textContent.trim();
+        if (pageTitle) pageTitle.textContent = item.textContent.trim();
         renderTorrents();
     });
 });
@@ -75,6 +91,7 @@ addTorrentBtn.addEventListener('click', async () => {
 
 // ─── Magnet Modal Logic ───
 addMagnetBtn.addEventListener('click', () => {
+    if (!outputDirInput.value) outputDirInput.value = DEFAULT_DOWNLOAD_DIR;
     magnetModal.classList.add('visible');
     modalOverlay.classList.add('visible');
     magnetUriInput.focus();
@@ -82,11 +99,44 @@ addMagnetBtn.addEventListener('click', () => {
 
 function hideModals() {
     magnetModal.classList.remove('visible');
+    settingsModal.classList.remove('visible');
     modalOverlay.classList.remove('visible');
 }
 
 closeModals.forEach(btn => btn.addEventListener('click', hideModals));
 modalOverlay.addEventListener('click', hideModals);
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hideModals();
+});
+
+// ─── Settings Modal (theme + about) ───
+const settingsModal = document.getElementById('settings-modal');
+const themeOptions = settingsModal.querySelectorAll('.theme-option');
+
+function markActiveTheme(theme) {
+    themeOptions.forEach(opt => {
+        const active = opt.dataset.theme === theme;
+        opt.classList.toggle('active', active);
+        opt.setAttribute('aria-checked', String(active));
+    });
+}
+
+document.getElementById('settings-btn').addEventListener('click', async () => {
+    const settings = await ipcRenderer.invoke('get-settings');
+    markActiveTheme(settings.theme);
+    document.getElementById('app-version').textContent = `v${settings.version}`;
+    settingsModal.classList.add('visible');
+    modalOverlay.classList.add('visible');
+});
+
+themeOptions.forEach(opt => opt.addEventListener('click', async () => {
+    markActiveTheme(opt.dataset.theme);
+    await ipcRenderer.invoke('set-theme', opt.dataset.theme);
+}));
+
+document.getElementById('project-link').addEventListener('click', () => {
+    ipcRenderer.invoke('open-project-page');
+});
 
 browseDirBtn.addEventListener('click', async () => {
     const dirPath = await ipcRenderer.invoke('open-directory-dialog');
@@ -274,7 +324,10 @@ function renderTorrents() {
         const progressValue = isMetadata ? 0 : (t.progress || 0);
         const progressText = isMetadata ? 'Searching Peers…' : t.progress.toFixed(1) + '%';
         const speedStr = (t.status === 'Downloading' && t._speed > 0) ? formatSpeed(t._speed) : '';
-        const icon = t.status === 'Completed' ? '✅' : (isMetadata ? '⏳' : (t.status === 'Stopped' ? '⏸️' : '⬇️'));
+        const [iconName, iconClass] = t.status === 'Completed' ? ['check', 'completed']
+            : isMetadata ? ['hourglass', 'metadata']
+            : t.status === 'Stopped' ? ['pause', 'stopped']
+            : ['download', 'downloading'];
 
         let isNewRow = false;
         let row = rowMap.get(t.id);
@@ -304,11 +357,16 @@ function renderTorrents() {
         const cells = row.children;
 
         // Cell 0: Name
-        const nameHtml = `<span class="icon">${icon}</span>${t.name || 'Initializing…'}`;
-        if (cells[0].innerHTML !== nameHtml) cells[0].innerHTML = nameHtml;
+        // (compared via a key: the browser re-serializes SVG markup, so innerHTML never matches the source string)
+        const name = t.name || 'Initializing…';
+        const nameKey = `${iconName}|${name}`;
+        if (cells[0].dataset.key !== nameKey) {
+            cells[0].dataset.key = nameKey;
+            cells[0].innerHTML = `${svgIcon(iconName, `icon ${iconClass}`)}<span class="name-text">${escapeHtml(name)}</span>`;
+        }
 
         // Cell 1: Status
-        const statusHtml = `<span class="status-text ${statusClass}">${displayStatus}</span>`;
+        const statusHtml = `<span class="status-text ${statusClass}">${escapeHtml(displayStatus)}</span>`;
         if (cells[1].innerHTML !== statusHtml) cells[1].innerHTML = statusHtml;
 
         // Cell 2: Size
@@ -407,8 +465,8 @@ function updateDetails(id) {
 
     details.innerHTML = `
         <div class="info-grid">
-            <div class="info-item"><span class="label">Name:</span> <span class="val">${torrent.name}</span></div>
-            <div class="info-item"><span class="label">Status:</span> <span class="val status-text ${torrent.status.toLowerCase().replace(/[^a-z]/g, '')}">${torrent.status}</span></div>
+            <div class="info-item"><span class="label">Name:</span> <span class="val">${escapeHtml(torrent.name)}</span></div>
+            <div class="info-item"><span class="label">Status:</span> <span class="val status-text ${torrent.status.toLowerCase().replace(/[^a-z]/g, '')}">${escapeHtml(torrent.status)}</span></div>
             <div class="info-item"><span class="label">Size:</span> <span class="val">${formatBytes(torrent.totalSize)}</span></div>
             <div class="info-item"><span class="label">Downloaded:</span> <span class="val">${formatBytes(downloaded)}</span></div>
             <div class="info-item"><span class="label">Speed:</span> <span class="val">${speedStr}</span></div>
@@ -416,7 +474,7 @@ function updateDetails(id) {
             <div class="info-item"><span class="label">Remaining:</span> <span class="val">${formatBytes(torrent.totalSize - downloaded)}</span></div>
             <div class="info-item"><span class="label">Peers:</span> <span class="val">${torrent.activePeers}</span></div>
             <div class="info-item"><span class="label">Time Elapsed:</span> <span class="val">${timeElapsed}</span></div>
-            <div class="info-item"><span class="label">Location:</span> <span class="val">${torrent.outputDir || '--'}</span></div>
+            <div class="info-item"><span class="label">Location:</span> <span class="val">${escapeHtml(torrent.outputDir || '--')}</span></div>
         </div>
     `;
 }
@@ -424,7 +482,8 @@ function updateDetails(id) {
 // ─── Folder & Remove Actions ───
 async function openFolder(path) {
     if (!path) return;
-    fetch(`${API_BASE}/open-folder?path=${encodeURIComponent(path)}`, { method: 'POST' });
+    const error = await ipcRenderer.invoke('open-folder', path);
+    if (error) showToast('Could not open folder', 'error');
 }
 window.openFolder = openFolder;
 
@@ -531,7 +590,7 @@ contextMenu.addEventListener('click', async (e) => {
 // ─── Connection Status ───
 function updateConnectionStatus(online) {
     const dot = document.querySelector('.status-dot');
-    const text = document.querySelector('.sidebar-footer .status-text');
+    const text = document.querySelector('.sidebar-footer .engine-status');
     if (dot && text) {
         dot.classList.toggle('online', online);
         dot.classList.toggle('offline', !online);
@@ -619,7 +678,7 @@ function formatDuration(seconds) {
 // ─── Incoming Magnet Links from OS ───
 ipcRenderer.on('magnet-uri', (event, data) => {
   const uri = typeof data === 'string' ? data : data.uri;
-  const defaultDir = data.defaultDir || '';
+  const defaultDir = data.defaultDir || DEFAULT_DOWNLOAD_DIR;
   if (uri) {
     magnetUriInput.value = uri;
     outputDirInput.value = defaultDir;

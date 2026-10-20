@@ -8,11 +8,56 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Hosting;
 using System.Diagnostics;
 
+// ── Writable app paths ─────────────────────────────────────────────────────
+// The packaged backend lives in a read-only directory, so all writable state
+// (CSV store, metadata cache, log) goes to DataDir instead of BaseDirectory.
+public static class AppPaths
+{
+    public static readonly string DataDir = ResolveDataDir();
+    public static readonly string DefaultDownloadDir = ResolveDefaultDownloadDir();
+
+    private static string ResolveDataDir()
+    {
+        var dir = Environment.GetEnvironmentVariable("RAWTORRENT_DATA_DIR");
+        if (string.IsNullOrWhiteSpace(dir))
+        {
+            var localAppData = Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData,
+                Environment.SpecialFolderOption.Create);
+            if (string.IsNullOrEmpty(localAppData)) localAppData = Path.GetTempPath();
+            dir = Path.Combine(localAppData, "RawTorrent");
+        }
+        try
+        {
+            dir = Path.GetFullPath(dir);
+            Directory.CreateDirectory(dir);
+        }
+        catch { }
+        return dir;
+    }
+
+    private static string ResolveDefaultDownloadDir()
+    {
+        // Desktop stays primary for backwards compatibility with existing Windows installs
+        var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory, Environment.SpecialFolderOption.None);
+        if (string.IsNullOrEmpty(baseDir) || !Directory.Exists(baseDir))
+        {
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.None);
+            baseDir = string.IsNullOrEmpty(home) ? DataDir : Path.Combine(home, "Downloads");
+        }
+        return Path.Combine(baseDir, "TorrentDownload");
+    }
+
+    /// <summary>Returns the default download dir when <paramref name="outputDir"/> is null/empty.</summary>
+    public static string ResolveOutputDir(string? outputDir) =>
+        string.IsNullOrWhiteSpace(outputDir) ? DefaultDownloadDir : outputDir;
+}
+
 // ── Simple file logger ─────────────────────────────────────────────────────
 public static class AppLogger
 {
     private static readonly string LogPath = Path.Combine(
-        AppContext.BaseDirectory,
+        AppPaths.DataDir,
         "rawtorrent_errors.log");
 
     private static readonly bool _enabled = ReadEnabledFromSettings();
@@ -71,6 +116,9 @@ class Program
 {
     private static WebApplication? _app;
 
+    [System.Runtime.InteropServices.DllImport("libc", SetLastError = false)]
+    private static extern int getppid();
+
     static async Task Main(string[] args)
     {
         // Global exception hooks
@@ -104,6 +152,9 @@ class Program
         ThreadPool.SetMinThreads(200, 200);
 
         AppLogger.Log("STARTUP", "Starting RawTorrent Server...");
+        AppLogger.Log("STARTUP", $"Data directory: {AppPaths.DataDir}");
+
+        StartParentWatchdog();
 
         try
         {
@@ -123,13 +174,21 @@ class Program
                 });
             });
 
-            int port = 5000;
+            int startPort = 5000;
+            var portEnv = Environment.GetEnvironmentVariable("RAWTORRENT_PORT");
+            // Electron picks a free port and points the UI at it, so that exact port must be used
+            bool fixedPort = int.TryParse(portEnv, out var envPort) && envPort > 0 && envPort <= 65535;
+            if (fixedPort) startPort = envPort;
+            string host = fixedPort ? "127.0.0.1" : "localhost";
+            int lastPort = fixedPort ? startPort : Math.Min(startPort + 899, 65535);
+
+            int port = startPort;
             bool started = false;
-            while (!started && port < 5900)
+            while (!started && port <= lastPort)
             {
                 try
                 {
-                    builder.WebHost.UseUrls($"http://localhost:{port}");
+                    builder.WebHost.UseUrls($"http://{host}:{port}");
                     _app = builder.Build();
                     
                     _app.UseCors("AllowAll");
@@ -141,7 +200,10 @@ class Program
                     _app.UseAuthorization();
                     _app.MapControllers();
 
-                    AppLogger.Log("SERVER", $"RawTorrent Engine running at http://localhost:{port}");
+                    // Logged only once Kestrel has actually bound the port
+                    int boundPort = port;
+                    _app.Lifetime.ApplicationStarted.Register(() =>
+                        AppLogger.Log("SERVER", $"RawTorrent Engine running at http://{host}:{boundPort}"));
                     await _app.RunAsync();
                     started = true;
                 }
@@ -163,7 +225,48 @@ class Program
         catch (Exception ex)
         {
             AppLogger.LogError("STARTUP ERROR", ex);
+            Environment.ExitCode = 1;
         }
+    }
+
+    // Exits when the spawning (Electron) process is gone so an orphaned backend
+    // does not keep holding its ports.
+    static void StartParentWatchdog()
+    {
+        var pidEnv = Environment.GetEnvironmentVariable("RAWTORRENT_PARENT_PID");
+        if (!int.TryParse(pidEnv, out var parentPid) || parentPid <= 0) return;
+
+        AppLogger.Log("STARTUP", $"Watching parent process {parentPid}");
+
+        // On Unix a killed parent can linger as a zombie (still "running" to Process),
+        // but our own parent pid changes as soon as we are re-parented.
+        int initialPpid = OperatingSystem.IsWindows() ? 0 : getppid();
+
+        Task.Run(async () =>
+        {
+            while (true)
+            {
+                bool parentGone;
+                try
+                {
+                    using var parent = Process.GetProcessById(parentPid);
+                    parentGone = parent.HasExited;
+                }
+                catch (ArgumentException) { parentGone = true; }
+                catch { parentGone = false; } // e.g. access denied - assume still alive
+
+                if (!parentGone && initialPpid > 0 && getppid() != initialPpid)
+                    parentGone = true;
+
+                if (parentGone)
+                {
+                    AppLogger.Log("SHUTDOWN", $"Parent process {parentPid} exited; shutting down.");
+                    Environment.Exit(0);
+                }
+
+                await Task.Delay(2000);
+            }
+        });
     }
 
     static async Task RunCli(string[] args)

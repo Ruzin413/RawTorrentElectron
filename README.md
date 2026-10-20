@@ -8,14 +8,33 @@
 - **Asynchronous Architecture**: Decoupled backend and frontend ensures the UI never flickers or freezes, even during heavy file I/O or multi-gigabit downloads.
 - **Context-Menu Management**: Clean, distraction-free layout using right-click context menus for advanced management (Stop, Resume, Open Folder, Delete with Data).
 - **Persistent Progress**: Remembers every download state using a lightweight CSV data store.
-- **Self-Contained Setup**: Bundled as a professional Windows installer that includes all necessary .NET runtimes—no external dependencies required.
+- **Self-Contained Setup**: Ships as a Windows installer and as Linux AppImage / `.deb` packages that include the .NET runtime—no external dependencies required.
 
 ##  Getting Started
 
 ### Installation
-1. Download the latest **`RawTorrent_Setup.exe`** from the [Releases](https://github.com/Ruzin413/RawTorrentDesktop/releases) page.
+
+#### Windows
+1. Download the latest **`RawTorrent-win-<version>.exe`** from the [Releases](https://github.com/Ruzin413/RawTorrentDesktop/releases) page.
 2. Run the installer and follow the wizard.
 3. Launch **RawTorrent** from your desktop and start downloading!
+
+#### Linux (x64)
+Download from the [Releases](https://github.com/Ruzin413/RawTorrentDesktop/releases) page:
+
+- **Debian / Ubuntu (`.deb`)**:
+  ```bash
+  sudo apt install ./RawTorrent-linux-<version>-amd64.deb
+  ```
+  Then launch **RawTorrent** from your app menu, or run `rawtorrent`. The package registers RawTorrent as the handler for `magnet:` links and `.torrent` files.
+- **Any distro (AppImage)**:
+  ```bash
+  chmod +x RawTorrent-linux-<version>-x86_64.AppImage
+  ./RawTorrent-linux-<version>-x86_64.AppImage
+  ```
+  AppImages need FUSE 2 (`sudo apt install libfuse2t64` on Ubuntu 24.04+, `libfuse2` on older releases).
+
+On Linux, app data (torrent list, progress, metadata cache, error log) is stored in `~/.local/share/RawTorrent`. The engine's console log is at `~/.config/rawtorrent-electron/logs/backend.log`.
 
 ### Development Setup
 To run the project in development mode:
@@ -32,18 +51,30 @@ To run the project in development mode:
    npm run dev
    ```
 
-### Building the Installer
-To generate your own professional setup wizard:
+### Building the Installers
+Building needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Node.js. Every build publishes the .NET backend as a self-contained single file, then packages it with Electron into `dist-installer/`.
+
+| Target | Command | Run on | Output |
+|---|---|---|---|
+| Windows installer | `npm run build:win` | Windows | `RawTorrent-win-<version>.exe` |
+| Linux AppImage + `.deb` | `npm run build:linux` | Linux | `RawTorrent-linux-<version>-x86_64.AppImage`, `RawTorrent-linux-<version>-amd64.deb` |
+| Linux, from Windows | `npm run build:linux:wsl` | Windows with WSL | Same as above, copied back to `dist-installer/` |
+
+AppImage and `.deb` packages can't be built natively on Windows, so `build:linux:wsl` syncs the project into a WSL distro (default `Ubuntu-24.04`, which needs `node`, `dotnet` and `rsync`), builds it there, and copies the packages back.
+
+### Releasing
+Releases are built automatically by GitHub Actions (`.github/workflows/release.yml`). Push a version tag and the workflow builds the Windows installer plus the Linux AppImage and `.deb`, then publishes them as a GitHub Release:
 ```bash
-npm run build
+git tag v1.0.1
+git push origin v1.0.1
 ```
-This will compile the .NET backend and package the Electron app into a single installer found in the `dist-installer/` folder.
+The tag sets the app version. Tags with a suffix (e.g. `v1.1.0-beta.1`) are published as pre-releases. To test the build without releasing, run **Build & Release** manually from the Actions tab; the installers are attached to the run as artifacts.
 
 ##  Tech Stack
 
 - **Frontend**: Electron, Vanilla JavaScript, CSS3 (Modern Typography & Grid).
 - **Backend**: ASP.NET Core (C# .NET 10.0), hosted locally at `localhost:5000`.
-- **Packaging**: Electron Builder & NSIS.
+- **Packaging**: Electron Builder (NSIS for Windows; AppImage and deb for Linux).
 - **Data Persistence**: CSV-based storage for minimal overhead.
 
 ##  Author

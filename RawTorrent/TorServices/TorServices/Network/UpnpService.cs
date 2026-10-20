@@ -136,7 +136,19 @@ public class UpnpService
 
     private static string? GetLocalIpAddress()
     {
+        // "Connecting" a UDP socket sends nothing but makes the OS pick the
+        // outbound interface. The hostname lookup below returns 127.0.1.1 on Debian/Ubuntu.
+        try
+        {
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.Connect("8.8.8.8", 65530);
+            if (socket.LocalEndPoint is IPEndPoint endPoint && !IPAddress.IsLoopback(endPoint.Address)
+                && !endPoint.Address.Equals(IPAddress.Any))
+                return endPoint.Address.ToString();
+        }
+        catch { }
+
         var host = Dns.GetHostEntry(Dns.GetHostName());
-        return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork)?.ToString();
+        return host.AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(ip))?.ToString();
     }
 }

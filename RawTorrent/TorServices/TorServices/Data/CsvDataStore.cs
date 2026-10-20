@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using TorServices.Models;
@@ -19,9 +20,7 @@ public class CsvDataStore
 
     public CsvDataStore()
     {
-        _dataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "RawTorrent");
+        _dataDir = AppPaths.DataDir;
         Directory.CreateDirectory(_dataDir);
 
         _torrentsFile = Path.Combine(_dataDir, "torrents.csv");
@@ -175,7 +174,7 @@ public class CsvDataStore
         var lines = new List<string> { "Id,Name,OutputDir,MagnetUri,TorrentPath,CreatedAt,ClientId" };
         foreach (var r in records)
         {
-            lines.Add($"{Esc(r.Id)},{Esc(r.Name)},{Esc(r.OutputDir)},{Esc(r.MagnetUri)},{Esc(r.TorrentPath)},{r.CreatedAt:O},{Esc(r.ClientId)}");
+            lines.Add($"{Esc(r.Id)},{Esc(r.Name)},{Esc(r.OutputDir)},{Esc(r.MagnetUri)},{Esc(r.TorrentPath)},{r.CreatedAt.ToString("O", CultureInfo.InvariantCulture)},{Esc(r.ClientId)}");
         }
         File.WriteAllLines(_torrentsFile, lines);
     }
@@ -186,7 +185,7 @@ public class CsvDataStore
         foreach (var p in records)
         {
             var bitfieldStr = p.Bitfield != null ? Convert.ToBase64String(p.Bitfield) : "";
-            lines.Add($"{Esc(p.TorrentId)},{Esc(p.Status)},{p.Progress},{p.TotalPieces},{p.CompletedPieces},{bitfieldStr},{p.LastUpdatedAt:O}");
+            lines.Add($"{Esc(p.TorrentId)},{Esc(p.Status)},{p.Progress.ToString("R", CultureInfo.InvariantCulture)},{p.TotalPieces.ToString(CultureInfo.InvariantCulture)},{p.CompletedPieces.ToString(CultureInfo.InvariantCulture)},{bitfieldStr},{p.LastUpdatedAt.ToString("O", CultureInfo.InvariantCulture)}");
         }
         File.WriteAllLines(_progressFile, lines);
     }
@@ -206,7 +205,7 @@ public class CsvDataStore
                 OutputDir = Unesc(parts[2]),
                 MagnetUri = Unesc(parts[3]),
                 TorrentPath = Unesc(parts[4]),
-                CreatedAt = DateTime.TryParse(parts[5], out var dt) ? dt : DateTime.UtcNow,
+                CreatedAt = ParseDate(parts[5]),
                 ClientId = Unesc(parts[6])
             };
         }
@@ -227,15 +226,23 @@ public class CsvDataStore
             {
                 TorrentId = Unesc(parts[0]),
                 Status = Unesc(parts[1]),
-                Progress = double.TryParse(parts[2], out var prog) ? prog : 0,
-                TotalPieces = int.TryParse(parts[3], out var tp) ? tp : 0,
-                CompletedPieces = int.TryParse(parts[4], out var cp) ? cp : 0,
+                Progress = ParseDouble(parts[2]),
+                TotalPieces = int.TryParse(parts[3], NumberStyles.Integer, CultureInfo.InvariantCulture, out var tp) ? tp : 0,
+                CompletedPieces = int.TryParse(parts[4], NumberStyles.Integer, CultureInfo.InvariantCulture, out var cp) ? cp : 0,
                 Bitfield = bitfield,
-                LastUpdatedAt = DateTime.TryParse(parts[6], out var dt) ? dt : DateTime.UtcNow,
+                LastUpdatedAt = ParseDate(parts[6]),
             };
         }
         catch { return null; }
     }
+
+    // Values are written culture-invariant ("O" dates, "." decimals); existing
+    // files from older builds used the same formats on en-US systems.
+    private static double ParseDouble(string value) =>
+        double.TryParse(Unesc(value), NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : 0;
+
+    private static DateTime ParseDate(string value) =>
+        DateTime.TryParse(Unesc(value), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dt) ? dt : DateTime.UtcNow;
 
     private static string Esc(string? value)
     {

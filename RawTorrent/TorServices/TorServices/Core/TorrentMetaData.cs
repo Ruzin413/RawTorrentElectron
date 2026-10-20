@@ -43,7 +43,7 @@ public class TorrentMetadata
                 var length = IntHelper.ToLong(dict["length"]);
                 var pathList = (List<object>)dict["path"];
                 
-                var pathParts = pathList.Select(p => Encoding.UTF8.GetString((byte[])p)).ToArray();
+                var pathParts = pathList.Select(p => CleanupPath(Encoding.UTF8.GetString((byte[])p))).ToArray();
                 string relativePath = Path.Combine(pathParts);
                 
                 // Root folder + relative path
@@ -61,11 +61,23 @@ public class TorrentMetadata
         }
     }
 
-    private string CleanupPath(string path)
+    // Fixed (Windows) invalid set so behaviour is identical on every OS.
+    private static readonly char[] InvalidNameChars =
+        "<>:\"/\\|?*".Concat(Enumerable.Range(0, 32).Select(i => (char)i)).ToArray();
+
+    /// <summary>
+    /// Sanitizes a single path segment from torrent metadata so it can't contain
+    /// separators or be "." / ".." (which would escape the output directory).
+    /// </summary>
+    public static string CleanupPath(string path)
     {
-        foreach (char c in Path.GetInvalidFileNameChars())
+        foreach (char c in InvalidNameChars)
         {
             path = path.Replace(c, '_');
+        }
+        if (string.IsNullOrWhiteSpace(path) || path.Trim().Trim('.').Length == 0)
+        {
+            path = "_";
         }
         return path;
     }

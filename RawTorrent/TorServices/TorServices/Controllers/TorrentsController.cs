@@ -32,6 +32,7 @@ public class TorrentsController : ControllerBase
     [HttpPost("browse-native")]
     public IActionResult BrowseNative()
     {
+        if (!OperatingSystem.IsWindows()) return StatusCode(501, "Native folder dialog is only available on Windows");
         try
         {
             var script = "Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.FolderBrowserDialog; $f.ShowNewFolderButton = $true; if($f.ShowDialog() -eq 'OK') { $f.SelectedPath }";
@@ -59,6 +60,7 @@ public class TorrentsController : ControllerBase
     [HttpPost("browse-file-native")]
     public IActionResult BrowseFileNative()
     {
+        if (!OperatingSystem.IsWindows()) return StatusCode(501, "Native file dialog is only available on Windows");
         try
         {
             var script = "Add-Type -AssemblyName System.Windows.Forms; $f = New-Object System.Windows.Forms.OpenFileDialog; $f.Filter = 'Torrent Files (*.torrent)|*.torrent|All Files (*.*)|*.*'; if($f.ShowDialog() -eq 'OK') { $f.FileName }";
@@ -247,7 +249,17 @@ public class TorrentsController : ControllerBase
         
         try
         {
-            System.Diagnostics.Process.Start("explorer.exe", path);
+            var opener = OperatingSystem.IsWindows() ? "explorer.exe"
+                : OperatingSystem.IsMacOS() ? "open"
+                : "xdg-open";
+            var psi = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = opener,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            psi.ArgumentList.Add(path);
+            System.Diagnostics.Process.Start(psi)?.Dispose();
             return Ok();
         }
         catch (Exception ex)

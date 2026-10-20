@@ -4,17 +4,20 @@
   "description": "Cross-platform Torrent Client with .NET Backend",
   "main": "main.js",
   "author": {
-    "name": "Rujin Manandhar"
+    "name": "Rujin Manandhar",
+    "email": "rzmdr413@gmail.com"
   },
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
     "register:protocol": "powershell -ExecutionPolicy Bypass -File scripts/register-protocol.ps1",
     "unregister:protocol": "powershell -ExecutionPolicy Bypass -File scripts/register-protocol.ps1 -Unregister",
-    "publish:backend:win": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
-    "publish:backend:linux": "dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
+    "clean:backend": "node -e \"require('fs').rmSync('dist-backend',{recursive:true,force:true})\"",
+    "publish:backend:win": "npm run clean:backend && dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
+    "publish:backend:linux": "npm run clean:backend && dotnet publish RawTorrent/TorServices/TorServices/TorServices.csproj -c Release -r linux-x64 --self-contained true -p:PublishSingleFile=true -o ./dist-backend",
     "build:win": "npm run publish:backend:win && electron-builder --win",
-    "build:linux": "npm run publish:backend:linux && electron-builder --linux"
+    "build:linux": "npm run publish:backend:linux && electron-builder --linux --x64",
+    "build:linux:wsl": "powershell -ExecutionPolicy Bypass -File scripts/build-linux-wsl.ps1"
   },
   "build": {
     "appId": "com.rawtorrent.app",
@@ -23,6 +26,7 @@
     "directories": {
       "output": "dist-installer"
     },
+    "afterPack": "scripts/after-pack.js",
     "files": [
       "main.js",
       "renderer.js",
@@ -40,8 +44,22 @@
         "AppImage",
         "deb"
       ],
-      "icon": "build/installer/icon.png",
-      "category": "Network"
+      "icon": "build/icons",
+      "category": "Network",
+      "executableName": "rawtorrent",
+      "synopsis": "Fast desktop torrent client",
+      "description": "RawTorrent is a desktop torrent client with an Electron UI and a self-contained .NET engine.",
+      "maintainer": "Rujin Manandhar <rzmdr413@gmail.com>",
+      "mimeTypes": [
+        "application/x-bittorrent",
+        "x-scheme-handler/magnet"
+      ]
+    },
+    "deb": {
+      "artifactName": "${productName}-${os}-${version}-${arch}.${ext}"
+    },
+    "appImage": {
+      "artifactName": "${productName}-${os}-${version}-${arch}.${ext}"
     },
     "protocols": [
       {
@@ -66,7 +84,8 @@
         "from": "dist-backend",
         "to": "backend",
         "filter": [
-          "**/*"
+          "**/*",
+          "!*.pdb"
         ]
       }
     ]
@@ -74,5 +93,6 @@
   "devDependencies": {
     "electron": "^31.0.0",
     "electron-builder": "^24.13.3"
-  }
+  },
+  "homepage": "https://github.com/Ruzin413/RawTorrentDesktop"
 }

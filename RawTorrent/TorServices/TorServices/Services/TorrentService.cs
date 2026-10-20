@@ -32,20 +32,34 @@ public class TorrentService
     public TorrentService(CsvDataStore store)
     {
         _store = store;
-        _metadataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "RawTorrent", "Metadata");
+        _metadataDir = Path.Combine(AppPaths.DataDir, "Metadata");
         Directory.CreateDirectory(_metadataDir);
 
         LoadFromStore();
         StartBackgroundMonitor();
         UpnpService.ForwardPort(6881, "RawTorrent").FireAndForget("UPnP Port Forwarding");
         
-        var listener = new PeerListener(6881, OnIncomingConnection);
-        listener.Start();
+        // Incoming peers / LSD are optional: a busy port or missing multicast
+        // route must not take the whole service down.
+        try
+        {
+            var listener = new PeerListener(6881, OnIncomingConnection);
+            listener.Start();
+        }
+        catch (Exception ex)
+        {
+            AppLogger.LogError("PEER LISTENER", ex, "Incoming peer connections disabled (port 6881 unavailable?)");
+        }
 
-        var lsd = new LsdService(OnLsdPeerFound);
-        lsd.Start();
+        try
+        {
+            var lsd = new LsdService(OnLsdPeerFound);
+            lsd.Start();
+        }
+        catch (Exception ex)
+        {
+            AppLogger.LogError("LSD", ex, "Local Service Discovery disabled (port 6771 / multicast unavailable?)");
+        }
     }
 
     private void OnLsdPeerFound(byte[] infoHash, string address)
@@ -114,7 +128,7 @@ public class TorrentService
                 var controller = new TorrentController 
                 { 
                     Name = record.Name,
-                    OutputDir = record.OutputDir,
+                    OutputDir = AppPaths.ResolveOutputDir(record.OutputDir),
                     MagnetUri = record.MagnetUri,
                     TorrentPath = record.TorrentPath,
                     MetadataCacheDir = _metadataDir,
@@ -215,6 +229,7 @@ public class TorrentService
 
     public Task<string> StartTorrent(string path, string? outputDir = null, string? clientId = null)
     {
+        outputDir = AppPaths.ResolveOutputDir(outputDir);
         var controller = new TorrentController { TorrentPath = path, OutputDir = outputDir, ClientId = clientId };
         _controllers[controller.Id] = controller;
         
@@ -232,6 +247,7 @@ public class TorrentService
 
     public Task<string> StartMagnet(string uri, string? outputDir = null, string? clientId = null)
     {
+        outputDir = AppPaths.ResolveOutputDir(outputDir);
         var controller = new TorrentController { MagnetUri = uri, OutputDir = outputDir, ClientId = clientId, MetadataCacheDir = _metadataDir };
         var magnet = MagnetParser.Parse(uri);
         controller.SetId(BitConverter.ToString(magnet.InfoHash).Replace("-", "").ToLower());
@@ -389,7 +405,7 @@ public class TorrentService
         var record = _store.FindTorrent(id);
         if (record != null)
         {
-            if (outputDir == null) outputDir = record.OutputDir;
+            if (string.IsNullOrEmpty(outputDir)) outputDir = AppPaths.ResolveOutputDir(record.OutputDir);
             if (name == null) name = record.Name;
             found = true;
         }
@@ -397,7 +413,8 @@ public class TorrentService
         if (deleteData && !string.IsNullOrEmpty(outputDir) && !string.IsNullOrEmpty(name))
         {
             await Task.Run(async () => {
-                var targetPath = Path.Combine(outputDir, name);
+                // Same sanitized folder name the files were written under
+                var targetPath = Path.Combine(outputDir, TorrentMetadata.CleanupPath(name));
                 Console.WriteLine($"[Service] Attempting to delete data at: {targetPath}");
 
                 for (int i = 0; i < 15; i++) // Increased to 15 retries

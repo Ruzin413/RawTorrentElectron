@@ -9,12 +9,34 @@
 </head>
 
 <body>
+    <!-- Icon sprite (Lucide icons, ISC license) -->
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+        <symbol id="i-file-plus" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></symbol>
+        <symbol id="i-magnet" viewBox="0 0 24 24"><path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15"/><path d="m5 8 4 4"/><path d="m12 15 4 4"/></symbol>
+        <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3.5v17a1 1 0 0 0 1.5.86l14-8.5a1 1 0 0 0 0-1.72l-14-8.5A1 1 0 0 0 6 3.5z"/></symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24"><rect width="14" height="14" x="5" y="5" rx="2"/></symbol>
+        <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+        <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12l-4.41 4.41A2 2 0 0 0 7 17.83V22"/><path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/></symbol>
+        <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol>
+        <symbol id="i-minus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+        <symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+        <symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+    </svg>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <span class="logo-icon">⚡</span>
+                    <span class="logo-icon"><svg class="ico"><use href="#i-zap"/></svg></span>
                     <span class="logo-text">RawTorrent</span>
                 </div>
             </div>
@@ -22,20 +44,25 @@
                 <div class="nav-group">
                     <span class="nav-group-title">Torrents</span>
                     <button class="nav-item active" data-tab="all">
-                        <span class="icon">📁</span> All
+                        <svg class="ico icon"><use href="#i-layers"/></svg> All
                     </button>
                     <button class="nav-item" data-tab="downloading">
-                        <span class="icon">⬇️</span> Downloading
+                        <svg class="ico icon"><use href="#i-download"/></svg> Downloading
                     </button>
                     <button class="nav-item" data-tab="completed">
-                        <span class="icon">✅</span> Completed
+                        <svg class="ico icon"><use href="#i-check"/></svg> Completed
                     </button>
                 </div>
             </nav>
             <div class="sidebar-footer">
-                <div class="status-indicator">
-                    <span class="status-dot online"></span>
-                    <span class="status-text">Engine: Connected</span>
+                <div class="footer-row">
+                    <div class="status-indicator">
+                        <span class="status-dot online"></span>
+                        <span class="engine-status">Engine: Connected</span>
+                    </div>
+                    <button id="settings-btn" class="icon-btn" title="Settings">
+                        <svg class="ico"><use href="#i-settings"/></svg>
+                    </button>
                 </div>
             </div>
         </aside>
@@ -45,10 +72,10 @@
             <header class="toolbar">
                 <div class="toolbar-group">
                     <button id="add-torrent-btn" class="tool-btn" title="Add Torrent File">
-                        <span class="tool-icon">➕</span> Add Torrent
+                        <svg class="ico tool-icon"><use href="#i-file-plus"/></svg> Add Torrent
                     </button>
                     <button id="add-magnet-btn" class="tool-btn" title="Add Torrent from URL">
-                        <span class="tool-icon">🔗</span> Add Magnet
+                        <svg class="ico tool-icon"><use href="#i-magnet"/></svg> Add Magnet
                     </button>
                 </div>
                 <div class="toolbar-spacer"></div>
@@ -59,14 +86,13 @@
 
             <!-- Context Menu -->
             <div id="context-menu" class="context-menu">
-                <button class="ctx-item" data-action="resume"><span class="ctx-icon">▶️</span> Resume</button>
-                <button class="ctx-item" data-action="stop"><span class="ctx-icon">⏹️</span> Stop</button>
+                <button class="ctx-item" data-action="resume"><svg class="ico ctx-icon"><use href="#i-play"/></svg> Resume</button>
+                <button class="ctx-item" data-action="stop"><svg class="ico ctx-icon"><use href="#i-stop"/></svg> Stop</button>
                 <div class="ctx-divider"></div>
-                <button class="ctx-item" data-action="open-folder"><span class="ctx-icon">📂</span> Open Folder</button>
+                <button class="ctx-item" data-action="open-folder"><svg class="ico ctx-icon"><use href="#i-folder-open"/></svg> Open Folder</button>
                 <div class="ctx-divider"></div>
-                <button class="ctx-item" data-action="remove"><span class="ctx-icon">🗑️</span> Remove</button>
-                <button class="ctx-item ctx-danger" data-action="remove-data"><span class="ctx-icon">💀</span> Remove
-                    with Data</button>
+                <button class="ctx-item" data-action="remove"><svg class="ico ctx-icon"><use href="#i-minus-circle"/></svg> Remove</button>
+                <button class="ctx-item ctx-danger" data-action="remove-data"><svg class="ico ctx-icon"><use href="#i-trash"/></svg> Remove with Data</button>
             </div>
 
             <!-- Table -->
@@ -84,6 +110,7 @@
                     <tbody id="torrent-list"></tbody>
                 </table>
                 <div id="empty-state" class="empty-state" style="display: none;">
+                    <svg class="ico empty-icon"><use href="#i-folder-open"/></svg>
                     <p>No torrents to display.</p>
                 </div>
             </div>
@@ -111,7 +138,7 @@
     <div id="magnet-modal" class="modal">
         <div class="modal-header">
             <h3>Add Torrent from URL</h3>
-            <button class="close-modal">&times;</button>
+            <button class="close-modal" title="Close"><svg class="ico"><use href="#i-x"/></svg></button>
         </div>
         <div class="modal-body">
             <div class="form-group">
@@ -121,7 +148,7 @@
             <div class="form-group">
                 <label for="output-dir">Download Location</label>
                 <div class="input-group">
-                    <input type="text" id="output-dir" placeholder="C:\Downloads">
+                    <input type="text" id="output-dir" placeholder="Choose a download folder">
                     <button id="browse-dir-btn" class="btn btn-secondary">Browse…</button>
                 </div>
             </div>
@@ -129,6 +156,46 @@
         <div class="modal-footer">
             <button class="btn btn-secondary close-modal">Cancel</button>
             <button id="submit-magnet" class="btn btn-primary">Add Torrent</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-header">
+            <h3>Settings</h3>
+            <button class="close-modal" title="Close"><svg class="ico"><use href="#i-x"/></svg></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <span class="form-label">Appearance</span>
+                <div class="theme-options" role="radiogroup" aria-label="Theme">
+                    <button class="theme-option" role="radio" data-theme="light">
+                        <svg class="ico"><use href="#i-sun"/></svg>
+                        <span>Light</span>
+                    </button>
+                    <button class="theme-option" role="radio" data-theme="dark">
+                        <svg class="ico"><use href="#i-moon"/></svg>
+                        <span>Dark</span>
+                    </button>
+                    <button class="theme-option" role="radio" data-theme="system">
+                        <svg class="ico"><use href="#i-monitor"/></svg>
+                        <span>System</span>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="form-label">About</span>
+                <div class="about-card">
+                    <span class="logo-icon"><svg class="ico"><use href="#i-zap"/></svg></span>
+                    <div class="about-text">
+                        <div class="about-name">RawTorrent <span id="app-version" class="about-version"></span></div>
+                        <div class="about-credit">Developed by Rujin Manandhar</div>
+                    </div>
+                    <button id="project-link" class="btn btn-secondary" title="Open the project on GitHub">
+                        GitHub <svg class="ico"><use href="#i-external"/></svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
