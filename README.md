@@ -62,13 +62,15 @@ Building needs the [.NET 10 SDK](https://dotnet.microsoft.com/download) and Node
 
 AppImage and `.deb` packages can't be built natively on Windows, so `build:linux:wsl` syncs the project into a WSL distro (default `Ubuntu-24.04`, which needs `node`, `dotnet` and `rsync`), builds it there, and copies the packages back.
 
-### Releasing
-Releases are built automatically by GitHub Actions (`.github/workflows/release.yml`). Push a version tag and the workflow builds the Windows installer plus the Linux AppImage and `.deb`, then publishes them as a GitHub Release:
+### CI/CD
+The GitHub Actions pipeline (`.github/workflows/ci-cd.yml`) runs on every push to `main` and every pull request. It checks the code, builds the .NET backend, and packages the Windows installer plus the Linux AppImage and `.deb`. The installers are attached to each run as downloadable artifacts.
+
+To publish a release, push a version tag. The pipeline builds the installers and publishes them as a GitHub Release:
 ```bash
 git tag v1.0.1
 git push origin v1.0.1
 ```
-The tag sets the app version. Tags with a suffix (e.g. `v1.1.0-beta.1`) are published as pre-releases. To test the build without releasing, run **Build & Release** manually from the Actions tab; the installers are attached to the run as artifacts.
+The tag sets the app version. Tags with a suffix (e.g. `v1.1.0-beta.1`) are published as pre-releases. You can also start the pipeline by hand from the Actions tab (**CI/CD** → Run workflow); that never publishes a release.
 
 ##  Tech Stack
 
